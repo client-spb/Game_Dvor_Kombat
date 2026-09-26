@@ -3697,18 +3697,11 @@ const ctx = cv.getContext('2d');
 let VW = 960, SC = 1, DPR = 1;
 const VH = 540;
 function layout() {
-  const iw = window.innerWidth, ih = window.innerHeight;
-  const portrait = ih > iw;
-  let aw, ah;
-  if (portrait) {
-    aw = ih; ah = iw;
-    app.style.width = aw + 'px'; app.style.height = ah + 'px';
-    app.style.transform = 'rotate(90deg) translateY(-100%)';
-  } else {
-    aw = iw; ah = ih;
-    app.style.width = aw + 'px'; app.style.height = ah + 'px';
-    app.style.transform = 'none';
-  }
+  // Игра всегда горизонтальная: активность зафиксирована в sensorLandscape,
+  // CSS-поворот для портрета больше не нужен.
+  const aw = window.innerWidth, ah = window.innerHeight;
+  app.style.width = aw + 'px'; app.style.height = ah + 'px';
+  app.style.transform = 'none';
   VW = Math.round(clamp(aw / ah * VH, 760, 1200));
   SC = Math.min(aw / VW, ah / VH);
   stageEl.style.width = VW + 'px';
