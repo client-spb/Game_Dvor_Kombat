@@ -15,6 +15,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
     }
 
     buildTypes {
@@ -35,9 +39,7 @@ android {
             useLegacyPackaging = false
         }
     }
-    ndk {
-        abiFilters += listOf("arm64-v8a", "armeabi-v7a")
-    }
+
 
     // Сжатие ресурсов в APK
     androidResources {
