@@ -39,6 +39,9 @@ class MainActivity : ComponentActivity() {
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         // Инициализация Yandex Mobile Ads SDK + предзагрузка полноэкранной рекламы
         AdsManager.init(this)
+        // Во время показа рекламы ставим игру/музыку на паузу, после закрытия — снимаем
+        AdsManager.onAdShown = { pauseForAd() }
+        AdsManager.onAdClosed = { resumeAfterAd() }
 
         setContent {
             MaterialTheme {
@@ -120,6 +123,29 @@ class MainActivity : ComponentActivity() {
 
     private var webView: WebView? = null
 
+    /** Пауза игры и музыки на время показа рекламы (вызывается из UI-потока). */
+    private fun pauseForAd() {
+        runOnUiThread {
+            webView?.evaluateJavascript(
+                "(window.onAdShown && window.onAdShown()) || void 0", null
+            )
+        }
+    }
+
+    /** Снятие паузы после закрытия рекламы. */
+    private fun resumeAfterAd() {
+        runOnUiThread {
+            webView?.evaluateJavascript(
+                "(window.onAdClosed && window.onAdClosed()) || void 0", null
+            )
+            // Синхронизируем состояние rewarded-рекламы с кнопкой в качалке
+            val ok = AdsManager.rewardReadyState()
+            webView?.evaluateJavascript(
+                "(window.onRewardReady && window.onRewardReady($ok)) || void 0", null
+            )
+        }
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     @Composable
     private fun GameWebView() {
@@ -154,9 +180,22 @@ class MainActivity : ComponentActivity() {
                             // Игра полностью офлайн: внешние http(s)-ссылки не открываем
                             return request.url.scheme?.startsWith("http") == true
                         }
+                        override fun onPageFinished(view: WebView, url: String) {
+                            // Сообщаем игре текущее состояние рекламы сразу после загрузки страницы
+                            val ok = AdsManager.rewardReadyState()
+                            view.evaluateJavascript(
+                                "(window.onRewardReady && window.onRewardReady($ok)) || void 0", null
+                            )
+                        }
                     }
                     loadUrl("file:///android_asset/web/index.html")
-                }.also { webView = it }
+                }.also { wv ->
+                    webView = wv
+                    // AdsManager сможет слать события о готовности рекламы прямо в игру
+                    AdsManager.setWebViewEvaluator { js ->
+                        runOnUiThread { webView?.evaluateJavascript(js, null) }
+                    }
+                }
             }
         )
     }

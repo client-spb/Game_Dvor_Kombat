@@ -36,6 +36,19 @@ object AdsManager {
 
     private const val TAG = "AdsManager"
 
+    /** Колбэки жизненного цикла рекламы (устанавливаются из MainActivity). */
+    @Volatile var onAdShown: (() -> Unit)? = null
+    @Volatile var onAdClosed: (() -> Unit)? = null
+
+    /** Мост к WebView игры (устанавливается из MainActivity) для JS-колбэков. */
+    @Volatile private var webEval: ((String) -> Unit)? = null
+
+    fun setWebViewEvaluator(eval: ((String) -> Unit)?) { webEval = eval }
+
+    private fun evalJs(js: String) {
+        try { webEval?.invoke(js) } catch (_: Exception) {}
+    }
+
     /** Демо ID полноэкранной рекламы Yandex Mobile Ads. */
     const val AD_UNIT_ID = "demo-interstitial-yandex"
 
@@ -54,12 +67,18 @@ object AdsManager {
 
     /** Инициализация SDK. Вызывать один раз из Activity.onCreate(). */
     fun init(context: Context) {
+        appContext = context.applicationContext
         YandexAds.initialize(context.applicationContext) {
             Log.d(TAG, "YandexAds initialized")
             load(context)
             loadReward(context)
         }
     }
+
+    private var appContext: Context? = null
+
+    /** Текущее состояние rewarded-рекламы для WebView (вызывать при загрузке страницы). */
+    fun rewardReadyState(): Boolean = rewardReady.get()
 
     /** Загрузка полноэкранной рекламы. */
     fun load(context: Context) {
@@ -72,15 +91,23 @@ object AdsManager {
                 interstitialAd = ad
                 ready.set(true)
                 loading.set(false)
+                notifyWeb(context, true)
             }
 
             override fun onAdFailedToLoad(error: AdRequestError) {
                 Log.w(TAG, "Interstitial load failed: ${error.description}")
                 loading.set(false)
+                notifyWeb(context, false)
                 // повторная попытка через 10 секунд
                 Handler(Looper.getMainLooper()).postDelayed({ load(context) }, 10_000)
             }
         })
+    }
+
+    /** Сообщить WebView о готовности/недоступности рекламы (window.onRewardReady). */
+    private fun notifyWeb(context: Context, ok: Boolean) {
+        val js = "(window.onRewardReady && window.onRewardReady($ok)) || void 0"
+        Handler(Looper.getMainLooper()).post { evalJs(js) }
     }
 
     /**
@@ -97,17 +124,20 @@ object AdsManager {
         ad.setAdEventListener(object : InterstitialAdEventListener {
             override fun onAdShown() {
                 Log.d(TAG, "Interstitial shown")
+                onAdShown?.invoke()
             }
 
             override fun onAdFailedToShow(error: AdError) {
                 Log.w(TAG, "Interstitial show failed: ${error.description}")
                 interstitialAd = null
+                onAdClosed?.invoke()
                 load(activity)
             }
 
             override fun onAdDismissed() {
                 Log.d(TAG, "Interstitial dismissed")
                 interstitialAd = null
+                onAdClosed?.invoke()
                 // загрузить следующий показ
                 load(activity)
             }
@@ -143,11 +173,13 @@ object AdsManager {
                 rewardedAd = ad
                 rewardReady.set(true)
                 rewardLoading.set(false)
+                notifyWeb(context, true)
             }
 
             override fun onAdFailedToLoad(error: AdRequestError) {
                 Log.w(TAG, "Rewarded load failed: ${error.description}")
                 rewardLoading.set(false)
+                notifyWeb(context, false)
                 Handler(Looper.getMainLooper()).postDelayed({ loadReward(context) }, 10_000)
             }
         })
@@ -175,11 +207,13 @@ object AdsManager {
         ad.setAdEventListener(object : RewardedAdEventListener {
             override fun onAdShown() {
                 Log.d(TAG, "Rewarded shown")
+                onAdShown?.invoke()
             }
 
             override fun onAdFailedToShow(error: AdError) {
                 Log.w(TAG, "Rewarded show failed: ${error.description}")
                 rewardedAd = null
+                onAdClosed?.invoke()
                 deliver(false)
                 loadReward(activity)
             }
@@ -193,6 +227,7 @@ object AdsManager {
             override fun onAdDismissed() {
                 Log.d(TAG, "Rewarded dismissed")
                 rewardedAd = null
+                onAdClosed?.invoke()
                 // Если onRewarded не сработал — награды нет (пользователь не досмотрел)
                 deliver(rewardEarned)
                 loadReward(activity)

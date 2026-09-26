@@ -319,7 +319,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
    <div class="hdr"><h1>Качалка</h1><div class="wallet"><i class="ic" data-ic="coin"></i><span class="walletV">0</span></div></div>
    <div id="shopList"></div>
    <div id="adRow">
-    <div class="adnote">Реклама от Yandex Ads</div>
+    <div class="adnote" id="adNote">Реклама от Yandex Ads</div>
     <div class="adrow" id="adBox">
      <i class="uic ic" data-ic="coin"></i>
      <div class="ut"><b>Монеты за рекламу</b><span id="adSub">Посмотри ролик и получи +150 ₽</span></div>
@@ -3951,6 +3951,7 @@ btn('shopBack', () => showScreen('menu'));
 const AD_REWARD = 150;              // награда за просмотр ролика, ₽
 const AD_COOLDOWN = 5 * 60 * 1000;  // раз в 5 минут
 let adBusy = false;
+let adAvail = true;                 // есть ли загруженная rewarded-реклама
 function fmtLeft(ms) {
   const s = Math.ceil(ms / 1000), m = Math.floor(s / 60);
   return m + ':' + String(s % 60).padStart(2, '0');
@@ -3961,29 +3962,49 @@ function adAvailMs() {
 }
 function updateAdBtn() {
   const box = $('adBox'), b = $('adWatch'), left = adAvailMs();
+  if (!b) return;
   if (left > 0) {
     box.classList.add('cool'); b.classList.add('dis');
     $('adBtnT').textContent = fmtLeft(left);
     $('adSub').textContent = 'Следующий ролик через ' + fmtLeft(left);
+    $('adNote').textContent = 'Реклама от Yandex Ads';
   } else {
-    box.classList.remove('cool'); b.classList.remove('dis');
+    box.classList.remove('cool');
+    b.classList.toggle('dis', !adAvail);
     $('adBtnT').textContent = adBusy ? 'Жди...' : 'Смотреть';
     $('adSub').textContent = 'Посмотри ролик и получи +' + AD_REWARD + ' ₽';
+    $('adNote').textContent = adAvail ? 'Реклама готова ✓' : 'Загружаем рекламу...';
   }
 }
 setInterval(updateAdBtn, 1000);
+/* Нативный мост сообщает о готовности rewarded-рекламы */
+window.onRewardReady = function (ok) {
+  adAvail = !!ok;
+  if (!ok) adBusy = false;
+  updateAdBtn();
+};
 window.onRewardResult = function (earned) {
   adBusy = false;
-  if (SCR === 'shop') updateAdBtn();
+  updateAdBtn(); refreshShop(); refreshWallet(); refreshSelect();
   if (earned) {
     localStorage.setItem(SAVE_KEY + '_adT', String(Date.now()));
     SAVE.rub += AD_REWARD; persist(); FX.coin(); hap('success');
-    toast('+' + AD_REWARD + ' ₽ за просмотр!'); refreshWallet();
-    if (SCR === 'shop') updateAdBtn();
+    toast('+' + AD_REWARD + ' ₽ за просмотр!'); updateAdBtn();
   } else {
     FX.err(); hap('error');
     toast('Реклама не показана или ролик не досмотрен');
   }
+};
+/* Пауза игры/музыки на время рекламы и снятие паузы после неё (вызывает нативный мост) */
+window.onAdShown = function () {
+  try { FX.suspend(); } catch (e) {}
+  clearInput();
+  if (G.on && !G.paused && G.phase !== 'done') pauseGame();
+};
+window.onAdClosed = function () {
+  try { FX.resume(); } catch (e) {}
+  lastTs = performance.now();
+  updateAdBtn();
 };
 btn('adWatch', () => {
   if (adBusy) return;
