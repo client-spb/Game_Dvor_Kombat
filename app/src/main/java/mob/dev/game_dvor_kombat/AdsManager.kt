@@ -28,9 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * InterstitialAdLoader.loadAd(AdRequest, InterstitialAdLoadListener),
  * показ — interstitialAd.show(activity), события — InterstitialAdEventListener.
  *
- * Используется демо-адмерник полноэкранной рекламы: "demo-interstitial-yandex"
- * (всегда возвращает тестовое рекламное объявление).
- * Когда получите реальный адмерник в кабинете Yandex ADM, замените [AD_UNIT_ID].
+ * Используются боевые адмерники: interstitial "R-M-20122412-1", rewarded "R-M-20122412-2".
  */
 object AdsManager {
 
@@ -50,10 +48,11 @@ object AdsManager {
     }
 
     /** Демо ID полноэкранной рекламы Yandex Mobile Ads. */
-    const val AD_UNIT_ID = "demo-interstitial-yandex"
+    // Полноэкранная реклама (боевой адмерник)
+    const val AD_UNIT_ID = "R-M-20122412-1"
 
-    /** Демо ID вознаграждаемой (rewarded) рекламы Yandex Mobile Ads. */
-    const val REWARD_AD_UNIT_ID = "demo-rewarded-yandex"
+    /** Вознаграждаемая (rewarded) реклама — боевой адмерник. */
+    const val REWARD_AD_UNIT_ID = "R-M-20122412-2"
 
     private var loader: InterstitialAdLoader? = null
     private var interstitialAd: InterstitialAd? = null
