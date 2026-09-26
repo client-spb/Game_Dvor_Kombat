@@ -123,13 +123,9 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 #ladBottom .hint{font-size:13px;color:#cfc6b4;font-weight:700;margin-left:6px}
 
 /* ---------- shop ---------- */
-/* Колонка качалки — по центру, фикс. ширина 700px (не тянется на весь экран) */
-#shopWrap{position:absolute;left:50%;top:70px;bottom:14px;width:700px;margin-left:-350px;display:flex;flex-direction:column;gap:8px}
-#shopList{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;overflow-x:hidden;
-  padding-right:4px;scrollbar-width:none;-ms-overflow-style:none}
-#shopList::-webkit-scrollbar{width:0;height:0;display:none}
+#shopList{position:absolute;left:50%;top:74px;transform:translateX(-50%);width:640px;display:flex;flex-direction:column;gap:8px}
 .up{display:flex;align-items:center;gap:14px;height:68px;padding:0 12px;background:linear-gradient(90deg,rgba(40,37,33,.95),rgba(26,24,21,.95));
-  border:2px solid #4a4236;border-radius:6px;flex-shrink:0}
+  border:2px solid #4a4236;border-radius:6px}
 .up .uic{width:48px;height:48px;flex-shrink:0}
 .up .ut{flex:1}
 .up .ut b{font-family:'Russo One','Rubik',sans-serif;font-size:17px;display:block;color:#fff}
@@ -140,20 +136,11 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 .up .btn{height:44px;font-size:16px;min-width:120px;justify-content:center;padding:0 12px}
 .up .btn .bi{width:24px;height:24px}
 .btn.dis{filter:grayscale(1) brightness(.6)}
-#shopBack{align-self:flex-start;flex-shrink:0}
-/* блок «монеты за рекламу» — первая строка списка улучшений */
-.adrow{display:flex;align-items:center;gap:14px;height:68px;padding:0 12px;background:linear-gradient(90deg,rgba(24,40,34,.95),rgba(14,26,22,.95));
-  border:2px solid #1ea57f;border-radius:6px;box-shadow:0 0 14px rgba(56,214,166,.15);flex-shrink:0;margin-bottom:8px}
-.adrow .uic{width:48px;height:48px;flex-shrink:0}
-.adrow .ut{flex:1;min-width:0}
-.adrow .ut b{font-family:'Russo One','Rubik',sans-serif;font-size:17px;display:block;color:#9fe9d0}
-.adrow .ut span{font-size:12px;color:#bdb3a0;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.adrow .btn{height:44px;font-size:16px;min-width:120px;width:120px;flex-shrink:0;justify-content:center;padding:0 12px}
-.adrow .btn .bi{width:24px;height:24px}
-.adrow.cool{border-color:#4a4236;box-shadow:none}
-/* подсветка кнопок, ставших доступными после награды */
+#shopBack{position:absolute;left:22px;bottom:16px}
+/* кнопка «монеты за рекламу» в меню + подсветка доступных покупок после награды */
+#adBtn small{font-size:11px;font-weight:700;opacity:.85;margin-left:6px}
 @keyframes goldGlow{0%{box-shadow:0 0 0 rgba(255,210,58,0)}35%{box-shadow:0 0 16px rgba(255,210,58,.85)}100%{box-shadow:0 0 0 rgba(255,210,58,0)}}
-.up .btn.glow,.adrow .btn.glow{animation:goldGlow 1.2s ease-out 2}
+.up .btn.glow,#adBtn.glow{animation:goldGlow 1.2s ease-out 2}
 .up.bought{border-color:#ffd23a;box-shadow:0 0 12px rgba(255,210,58,.35)}
 
 /* ---------- hud ---------- */
@@ -281,6 +268,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     <button class="btn" id="bLadder"><i class="bi ic" data-ic="map"></i><span class="disp">Лестница районов</span></button>
     <button class="btn red" id="bSurv"><i class="bi ic" data-ic="flame"></i><span class="disp">Выживание</span><small id="survBest"></small></button>
     <button class="btn gray" id="bShop"><i class="bi ic" data-ic="dumbbell"></i><span class="disp">Качалка</span></button>
+    <button class="btn mint" id="adBtn"><i class="bi ic" data-ic="play"></i><span class="disp">Монеты за рекламу</span><small id="adNote">+150 ₽</small></button>
     <button class="btn gray" id="bAch"><i class="bi ic" data-ic="medal"></i><span class="disp">Достижения</span><small id="achCnt"></small></button>
     <button class="btn mint" id="bMaxCh"><i class="bi ic" data-ic="max"></i><span class="disp">Наш канал в MAX</span></button>
    </div>
@@ -324,19 +312,8 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   <!-- SHOP -->
   <div id="scrShop" class="scr">
    <div class="hdr"><h1>Качалка</h1><div class="wallet"><i class="ic" data-ic="coin"></i><span class="walletV">0</span></div></div>
-   <div id="shopWrap">
-     <i class="uic ic" data-ic="coin"></i>
-     <div class="ut"><b>Монеты за рекламу</b><span id="adSub">Посмотри ролик и получи +150 ₽ · <span id="adNote">раз в 5 минут</span></span></div>
-     <button class="btn mint" id="adWatch"><i class="bi ic" data-ic="play"></i><span class="disp" id="adBtnT">Смотреть</span></button>
-    </div>
-    <div id="shopList">
-     <div class="adrow" id="adBox">
-      <i class="uic ic" data-ic="coin"></i>
-      <div class="ut"><b>Монеты за рекламу</b><span id="adSub">Посмотри ролик и получи +150 ₽ · <span id="adNote">раз в 5 минут</span></span></div>
-      <button class="btn mint" id="adWatch"><i class="bi ic" data-ic="play"></i><span class="disp" id="adBtnT">Смотреть</span></button>
-     </div>
-    <button class="btn gray" id="shopBack"><i class="bi ic" data-ic="back"></i><span class="disp">Меню</span></button>
-   </div>
+   <div id="shopList"></div>
+   <button class="btn gray" id="shopBack"><i class="bi ic" data-ic="back"></i><span class="disp">Меню</span></button>
   </div>
 
   <!-- HUD -->
@@ -3940,21 +3917,13 @@ const UP_COST = [120, 260, 480, 800, 1250];
 let adJustEarned = false;           // после награды подсветить newly-доступные кнопки
 function refreshShop() {
   const l = $('shopList');
-  const scroll = l.scrollTop;   // сохраняем позицию скролла при перерисовке
-  /* рекламная строка всегда первой — вставляем её обратно после перерисовки списка */
-  const adBox = $('adBox');
-  if (adBox && adBox.parentElement !== l) l.appendChild(adBox);
-  l.innerHTML = '<div id="adSlot"></div>' + UPS.map(u => {
+  l.innerHTML = UPS.map(u => {
     const lv = SAVE.up[u.k], max = lv >= 5, cost = UP_COST[lv];
     return '<div class="up' + (adJustEarned && !max && SAVE.rub >= cost ? ' bought' : '') + '"><i class="uic ic" data-ic="' + u.ic + '"></i><div class="ut"><b>' + u.n + '</b><span>' + u.d + '</span><div class="pips">' +
       [0, 1, 2, 3, 4].map(i => '<i class="' + (i < lv ? 'on' : '') + '"></i>').join('') + '</div></div>' +
       (max ? '<button class="btn mint dis"><span class="disp">Максимум</span></button>' :
         '<button class="btn' + (SAVE.rub < cost ? ' dis' : (adJustEarned ? ' glow' : '')) + '" data-k="' + u.k + '"><i class="bi ic" data-ic="coin"></i><span class="disp">' + cost + '</span></button>') + '</div>';
   }).join('');
-  l.scrollTop = scroll;
-  /* возвращаем рекламную строку на первое место списка */
-  const slot = $('adSlot'), ab = $('adBox');
-  if (slot && ab) { l.insertBefore(ab, slot); l.removeChild(slot); }
   adJustEarned = false;
   paintIcons(l);
   l.querySelectorAll('button[data-k]').forEach(b => b.addEventListener('click', () => {
@@ -3967,7 +3936,7 @@ function refreshShop() {
 }
 btn('shopBack', () => showScreen('menu'));
 
-/* ---- монеты за рекламу (rewarded) ---- */
+/* ---- монеты за рекламу (rewarded) — кнопка в главном меню ---- */
 const AD_REWARD = 150;              // награда за просмотр ролика, ₽
 const AD_COOLDOWN = 5 * 60 * 1000;  // раз в 5 минут
 let adBusy = false;
@@ -3981,19 +3950,15 @@ function adAvailMs() {
   return Math.max(0, last + AD_COOLDOWN - Date.now());
 }
 function updateAdBtn() {
-  const box = $('adBox'), b = $('adWatch'), left = adAvailMs();
-  if (!b) return;
+  const b = $('adBtn'), note = $('adNote');
+  if (!b || !note) return;
+  const left = adAvailMs();
   if (left > 0) {
-    box.classList.add('cool'); b.classList.add('dis');
-    $('adBtnT').textContent = fmtLeft(left);
-    $('adSub').textContent = 'Следующий ролик через ' + fmtLeft(left);
-    $('adNote').textContent = 'ждём кулдаун';
+    b.classList.add('dis');
+    note.textContent = 'ждём ' + fmtLeft(left);
   } else {
-    box.classList.remove('cool');
-    b.classList.toggle('dis', !adAvail);
-    $('adBtnT').textContent = adBusy ? 'Жди...' : 'Смотреть';
-    $('adSub').textContent = 'Посмотри ролик и получи +' + AD_REWARD + ' ₽';
-    $('adNote').textContent = adAvail ? 'реклама готова ✓' : 'загружаем рекламу...';
+    b.classList.toggle('dis', adBusy || !adAvail);
+    note.textContent = adBusy ? 'показываем...' : (adAvail ? '+' + AD_REWARD + ' ₽' : 'загружаем...');
   }
 }
 setInterval(updateAdBtn, 1000);
@@ -4012,8 +3977,8 @@ window.onRewardResult = function (earned) {
     toast('+' + AD_REWARD + ' ₽ за просмотр!');
     adJustEarned = true;            // подсветить ставшие доступными кнопки
     updateAdBtn(); refreshShop(); refreshWallet(); refreshSelect();
-    const aw = $('adWatch');
-    if (aw && !aw.classList.contains('dis')) { aw.classList.add('glow'); setTimeout(() => aw.classList.remove('glow'), 2600); }
+    const ab = $('adBtn');
+    if (ab) { ab.classList.add('glow'); setTimeout(() => ab.classList.remove('glow'), 2600); }
   } else {
     updateAdBtn(); refreshShop(); refreshWallet(); refreshSelect();
     FX.err(); hap('error');
@@ -4032,9 +3997,10 @@ window.onAdClosed = function () {
   /* adBusy сбрасывается только через onRewardResult — здесь лишь обновляем UI */
   updateAdBtn();
 };
-btn('adWatch', () => {
+btn('adBtn', () => {
   if (adBusy) return;
   if (adAvailMs() > 0) { FX.err(); toast('Реклама будет доступна позже — раз в 5 минут'); return; }
+  if (!adAvail) { FX.err(); toast('Реклама ещё загружается, попробуй через пару секунд'); return; }
   adBusy = true; updateAdBtn();
   try {
     if (window.AndroidBridge && AndroidBridge.showRewardAd) { AndroidBridge.showRewardAd(); return; }
