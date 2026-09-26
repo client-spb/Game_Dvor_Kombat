@@ -33,6 +33,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         // Не даём экрану гаснуть во время боя
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // Инициализация Yandex Mobile Ads SDK + предзагрузка полноэкранной рекламы
+        AdsManager.init(this)
 
         setContent {
             MaterialTheme {
@@ -64,6 +66,12 @@ class MainActivity : ComponentActivity() {
             vm?.defaultVibrator?.vibrate(
                 VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE)
             )
+        }
+
+        /** Вызывается из игры при поражении — показываем полноэкранную рекламу. */
+        @JavascriptInterface
+        fun onGameLose() {
+            runOnUiThread { AdsManager.show(this@MainActivity) }
         }
     }
 

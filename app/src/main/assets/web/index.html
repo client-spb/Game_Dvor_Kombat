@@ -3967,6 +3967,8 @@ function showResult(win, rub, pts, unlockMsg) {
   clearInput();
   openOv('ovRes');
   if (win) { FX.stopMusic(); if (!st.fin) FX.win(); else setTimeout(() => FX.win(), 200); hap('success'); } else { hap('error'); }
+  // При поражении показываем полноэкранную рекламу (нативный мост Android)
+  if (!win) { try { if (window.AndroidBridge && AndroidBridge.onGameLose) AndroidBridge.onGameLose(); } catch (e) {} }
   G.phase = 'done';
 }
 btn('rNext', () => {
