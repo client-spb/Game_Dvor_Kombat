@@ -13,7 +13,7 @@ import com.yandex.mobile.ads.interstitial.InterstitialAdShowListener
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Менеджер полноэкранной рекламы (Yandex Mobile Ads SDK).
+ * Менеджер полноэкранной рекламы (Yandex Mobile Ads SDK 8.0.0).
  *
  * Используется демо-адмерник полноэкранной рекламы: "demo-interstitial-yandex"
  * (всегда возвращает тестовое рекламное объявление).
@@ -45,25 +45,23 @@ object AdsManager {
     fun load(activity: Activity) {
         if (loading.getAndSet(true)) return
         val ad = InterstitialAd()
-        ad.setAdUnitId(AD_UNIT_ID)
-        ad.loadAd(
-            ad.requestParams(),
-            object : InterstitialAdLoadingListener {
-                override fun onInterstitialAdLoaded(interstitial: InterstitialAd) {
-                    Log.d(TAG, "Interstitial loaded")
-                    interstitialAd = interstitial
-                    ready.set(true)
-                    loading.set(false)
-                }
-
-                override fun onInterstitialAdLoadFailed(adError: AdError) {
-                    Log.w(TAG, "Interstitial load failed: ${adError.message}")
-                    loading.set(false)
-                    // повторная попытка через 10 секунд
-                    Handler(Looper.getMainLooper()).postDelayed({ load(activity) }, 10_000)
-                }
+        ad.adUnitId = AD_UNIT_ID
+        ad.setInterstitialAdLoadingListener(object : InterstitialAdLoadingListener {
+            override fun onInterstitialAdLoaded(interstitial: InterstitialAd) {
+                Log.d(TAG, "Interstitial loaded")
+                interstitialAd = interstitial
+                ready.set(true)
+                loading.set(false)
             }
-        )
+
+            override fun onInterstitialAdLoadFailed(adError: AdError) {
+                Log.w(TAG, "Interstitial load failed: ${adError.message}")
+                loading.set(false)
+                // повторная попытка через 10 секунд
+                Handler(Looper.getMainLooper()).postDelayed({ load(activity) }, 10_000)
+            }
+        })
+        ad.loadAd(ad.requestParams())
     }
 
     /**
@@ -77,7 +75,7 @@ object AdsManager {
             return false
         }
         if (!ready.compareAndSet(true, false)) return false
-        ad.show(object : InterstitialAdShowListener {
+        ad.setInterstitialAdShowListener(object : InterstitialAdShowListener {
             override fun onAdShown() {
                 Log.d(TAG, "Interstitial shown")
             }
@@ -98,6 +96,7 @@ object AdsManager {
                 Log.d(TAG, "Interstitial clicked")
             }
         })
+        ad.show(activity, null)
         return true
     }
 }
