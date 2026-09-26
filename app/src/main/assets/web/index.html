@@ -123,12 +123,13 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 #ladBottom .hint{font-size:13px;color:#cfc6b4;font-weight:700;margin-left:6px}
 
 /* ---------- shop ---------- */
-#shopWrap{position:absolute;left:22px;right:22px;top:70px;bottom:14px;display:flex;flex-direction:column;gap:8px}
-#shopList{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:4px}
-#shopList::-webkit-scrollbar{width:6px}
-#shopList::-webkit-scrollbar-thumb{background:#4a4236;border-radius:3px}
+/* Колонка качалки — по центру, фикс. ширина 700px (не тянется на весь экран) */
+#shopWrap{position:absolute;left:50%;top:70px;bottom:14px;width:700px;margin-left:-350px;display:flex;flex-direction:column;gap:8px}
+#shopList{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;overflow-x:hidden;
+  padding-right:4px;scrollbar-width:none;-ms-overflow-style:none}
+#shopList::-webkit-scrollbar{width:0;height:0;display:none}
 .up{display:flex;align-items:center;gap:14px;height:68px;padding:0 12px;background:linear-gradient(90deg,rgba(40,37,33,.95),rgba(26,24,21,.95));
-  border:2px solid #4a4236;border-radius:6px}
+  border:2px solid #4a4236;border-radius:6px;flex-shrink:0}
 .up .uic{width:48px;height:48px;flex-shrink:0}
 .up .ut{flex:1}
 .up .ut b{font-family:'Russo One','Rubik',sans-serif;font-size:17px;display:block;color:#fff}
@@ -142,7 +143,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 #shopBack{align-self:flex-start;flex-shrink:0}
 /* блок «монеты за рекламу» — первая строка списка улучшений */
 .adrow{display:flex;align-items:center;gap:14px;height:68px;padding:0 12px;background:linear-gradient(90deg,rgba(24,40,34,.95),rgba(14,26,22,.95));
-  border:2px solid #1ea57f;border-radius:6px;box-shadow:0 0 14px rgba(56,214,166,.15);flex-shrink:0}
+  border:2px solid #1ea57f;border-radius:6px;box-shadow:0 0 14px rgba(56,214,166,.15);flex-shrink:0;margin-bottom:8px}
 .adrow .uic{width:48px;height:48px;flex-shrink:0}
 .adrow .ut{flex:1;min-width:0}
 .adrow .ut b{font-family:'Russo One','Rubik',sans-serif;font-size:17px;display:block;color:#9fe9d0}
@@ -324,12 +325,16 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   <div id="scrShop" class="scr">
    <div class="hdr"><h1>Качалка</h1><div class="wallet"><i class="ic" data-ic="coin"></i><span class="walletV">0</span></div></div>
    <div id="shopWrap">
-    <div class="adrow" id="adBox">
      <i class="uic ic" data-ic="coin"></i>
      <div class="ut"><b>Монеты за рекламу</b><span id="adSub">Посмотри ролик и получи +150 ₽ · <span id="adNote">раз в 5 минут</span></span></div>
      <button class="btn mint" id="adWatch"><i class="bi ic" data-ic="play"></i><span class="disp" id="adBtnT">Смотреть</span></button>
     </div>
-    <div id="shopList"></div>
+    <div id="shopList">
+     <div class="adrow" id="adBox">
+      <i class="uic ic" data-ic="coin"></i>
+      <div class="ut"><b>Монеты за рекламу</b><span id="adSub">Посмотри ролик и получи +150 ₽ · <span id="adNote">раз в 5 минут</span></span></div>
+      <button class="btn mint" id="adWatch"><i class="bi ic" data-ic="play"></i><span class="disp" id="adBtnT">Смотреть</span></button>
+     </div>
     <button class="btn gray" id="shopBack"><i class="bi ic" data-ic="back"></i><span class="disp">Меню</span></button>
    </div>
   </div>
@@ -3936,7 +3941,10 @@ let adJustEarned = false;           // после награды подсвет�
 function refreshShop() {
   const l = $('shopList');
   const scroll = l.scrollTop;   // сохраняем позицию скролла при перерисовке
-  l.innerHTML = UPS.map(u => {
+  /* рекламная строка всегда первой — вставляем её обратно после перерисовки списка */
+  const adBox = $('adBox');
+  if (adBox && adBox.parentElement !== l) l.appendChild(adBox);
+  l.innerHTML = '<div id="adSlot"></div>' + UPS.map(u => {
     const lv = SAVE.up[u.k], max = lv >= 5, cost = UP_COST[lv];
     return '<div class="up' + (adJustEarned && !max && SAVE.rub >= cost ? ' bought' : '') + '"><i class="uic ic" data-ic="' + u.ic + '"></i><div class="ut"><b>' + u.n + '</b><span>' + u.d + '</span><div class="pips">' +
       [0, 1, 2, 3, 4].map(i => '<i class="' + (i < lv ? 'on' : '') + '"></i>').join('') + '</div></div>' +
@@ -3944,6 +3952,9 @@ function refreshShop() {
         '<button class="btn' + (SAVE.rub < cost ? ' dis' : (adJustEarned ? ' glow' : '')) + '" data-k="' + u.k + '"><i class="bi ic" data-ic="coin"></i><span class="disp">' + cost + '</span></button>') + '</div>';
   }).join('');
   l.scrollTop = scroll;
+  /* возвращаем рекламную строку на первое место списка */
+  const slot = $('adSlot'), ab = $('adBox');
+  if (slot && ab) { l.insertBefore(ab, slot); l.removeChild(slot); }
   adJustEarned = false;
   paintIcons(l);
   l.querySelectorAll('button[data-k]').forEach(b => b.addEventListener('click', () => {
@@ -3988,8 +3999,9 @@ function updateAdBtn() {
 setInterval(updateAdBtn, 1000);
 /* Нативный мост сообщает о готовности rewarded-рекламы */
 window.onRewardReady = function (ok) {
+  /* во время просмотра рекламы игнорируем служебные события (в т.ч. от interstitial) */
+  if (adBusy) return;
   adAvail = !!ok;
-  if (!ok) adBusy = false;
   updateAdBtn();
 };
 window.onRewardResult = function (earned) {
@@ -4017,6 +4029,7 @@ window.onAdShown = function () {
 window.onAdClosed = function () {
   try { FX.resume(); } catch (e) {}
   lastTs = performance.now();
+  /* adBusy сбрасывается только через onRewardResult — здесь лишь обновляем UI */
   updateAdBtn();
 };
 btn('adWatch', () => {

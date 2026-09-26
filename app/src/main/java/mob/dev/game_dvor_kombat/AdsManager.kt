@@ -80,6 +80,13 @@ object AdsManager {
     /** Текущее состояние rewarded-рекламы для WebView (вызывать при загрузке страницы). */
     fun rewardReadyState(): Boolean = rewardReady.get()
 
+    /** Сообщить WebView о состоянии именно rewarded-рекламы (window.onRewardReady). */
+    private fun notifyRewardWeb(ok: Boolean) {
+        Handler(Looper.getMainLooper()).post {
+            evalJs("(window.onRewardReady && window.onRewardReady($ok)) || void 0")
+        }
+    }
+
     /** Загрузка полноэкранной рекламы. */
     fun load(context: Context) {
         if (loading.getAndSet(true)) return
@@ -91,23 +98,15 @@ object AdsManager {
                 interstitialAd = ad
                 ready.set(true)
                 loading.set(false)
-                notifyWeb(context, true)
             }
 
             override fun onAdFailedToLoad(error: AdRequestError) {
                 Log.w(TAG, "Interstitial load failed: ${error.description}")
                 loading.set(false)
-                notifyWeb(context, false)
                 // повторная попытка через 10 секунд
                 Handler(Looper.getMainLooper()).postDelayed({ load(context) }, 10_000)
             }
         })
-    }
-
-    /** Сообщить WebView о готовности/недоступности рекламы (window.onRewardReady). */
-    private fun notifyWeb(context: Context, ok: Boolean) {
-        val js = "(window.onRewardReady && window.onRewardReady($ok)) || void 0"
-        Handler(Looper.getMainLooper()).post { evalJs(js) }
     }
 
     /**
@@ -173,13 +172,13 @@ object AdsManager {
                 rewardedAd = ad
                 rewardReady.set(true)
                 rewardLoading.set(false)
-                notifyWeb(context, true)
+                notifyRewardWeb(true)
             }
 
             override fun onAdFailedToLoad(error: AdRequestError) {
                 Log.w(TAG, "Rewarded load failed: ${error.description}")
                 rewardLoading.set(false)
-                notifyWeb(context, false)
+                notifyRewardWeb(false)
                 Handler(Looper.getMainLooper()).postDelayed({ loadReward(context) }, 10_000)
             }
         })
