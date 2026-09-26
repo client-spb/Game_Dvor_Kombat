@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>ДВОР-КОМБАТ</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -215,24 +212,7 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 .rstats{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;background:rgba(0,0,0,.35);border-radius:4px;padding:10px 14px;margin-bottom:12px;font-size:14px}
 .rstats div{display:flex;justify-content:space-between}
 .rstats b{color:#ffd23a}
-#lbPanel{width:460px;height:470px;display:flex;flex-direction:column}
-#lbList{flex:1;overflow-y:auto;padding-right:4px;margin-bottom:10px}
-#lbList::-webkit-scrollbar{width:6px}#lbList::-webkit-scrollbar-thumb{background:#5c5140;border-radius:3px}
-.lb-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border-left:4px solid #5c5140;padding:7px 10px;margin-bottom:6px}
-.lb-row.top-1{background:rgba(255,210,58,.16);border-left-color:#ffd23a}
-.lb-row.top-2{background:rgba(200,200,210,.12);border-left-color:#c8c8d2}
-.lb-row.top-3{background:rgba(205,127,50,.14);border-left-color:#cd7f32}
-.lb-medal{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#bdb3a0}
-.lb-medal.gold,.lb-medal.silver,.lb-medal.bronze{border-radius:50%;color:#1c1712;font-size:16px}
-.lb-medal.gold{background:radial-gradient(circle at 35% 30%,#fff7b0,#ffd23a 50%,#a07000)}
-.lb-medal.silver{background:radial-gradient(circle at 35% 30%,#fff,#c8c8d2 50%,#70707a)}
-.lb-medal.bronze{background:radial-gradient(circle at 35% 30%,#ffd9b0,#cd7f32 50%,#7a4410)}
-.lb-avatar{position:relative;width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:15px;overflow:hidden;background:linear-gradient(135deg,#38d6a6,#1e6b58);color:#fff}
-.lb-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.lb-name{flex:1;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lb-score{font-family:'Russo One','Rubik',sans-serif;font-size:16px;color:#ffd23a;flex-shrink:0}
-.lb-empty{text-align:center;padding:40px 10px;opacity:.7;font-size:15px}
+
 #achPanel{width:560px;height:480px;display:flex;flex-direction:column}
 #achList{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start;padding-right:4px;margin-bottom:10px}
 #achList::-webkit-scrollbar{width:6px}#achList::-webkit-scrollbar-thumb{background:#5c5140;border-radius:3px}
@@ -284,13 +264,10 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     <button class="btn red" id="bSurv"><i class="bi ic" data-ic="flame"></i><span class="disp">Выживание</span><small id="survBest"></small></button>
     <button class="btn gray" id="bShop"><i class="bi ic" data-ic="dumbbell"></i><span class="disp">Качалка</span></button>
     <button class="btn gray" id="bAch"><i class="bi ic" data-ic="medal"></i><span class="disp">Достижения</span><small id="achCnt"></small></button>
-    <button class="btn mint" id="bLb"><i class="bi ic" data-ic="trophy"></i><span class="disp">Рейтинг игроков</span></button>
    </div>
    <div id="menuIcons">
     <button class="rbtn" id="bSnd1"><i class="ic" data-ic="snd"></i></button>
     <button class="rbtn" id="bHelp"><i class="ic" data-ic="help"></i></button>
-    <button class="rbtn" id="bShare1"><i class="ic" data-ic="share"></i></button>
-    <button class="rbtn" id="bPriv"><i class="ic" data-ic="doc"></i></button>
    </div>
    <div class="wallet" id="menuWallet"><i class="ic" data-ic="coin"></i><span id="walletV">0</span></div>
    <div class="wallet" id="menuScore"><i class="ic" data-ic="star"></i><span id="scoreV">0</span></div>
@@ -377,9 +354,6 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
     </div>
   </div></div>
 
-  <div class="ovl" id="ovLb"><div class="panel" id="lbPanel"><h2>Рейтинг игроков</h2><div id="lbList"></div>
-    <button class="btn gray" id="lbClose" style="justify-content:center"><span class="disp">Закрыть</span></button></div></div>
-
   <div class="ovl" id="ovAch"><div class="panel" id="achPanel"><h2>Достижения</h2><div id="achList"></div>
     <button class="btn gray" id="achClose" style="justify-content:center"><span class="disp">Закрыть</span></button></div></div>
 
@@ -399,8 +373,6 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   <div id="toast"></div>
  </div>
 </div>
-<script src="https://st.max.ru/js/max-web-app.js"></script>
-<script src="/static/games/max-games-sdk.js?v=2"></script>
 <script>
 (function(){
 'use strict';
@@ -409,7 +381,6 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
    ===================================================================== */
 const GAME_NAME = 'dvor_kombat';
 const SAVE_KEY = 'dvor_kombat_save_v1';
-const SHARE_LINK = 'https://max.ru/channel_igroteka_max';
 
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
@@ -496,10 +467,8 @@ function hap(kind) {
   if (now - lastHap < 55) return;
   lastHap = now;
   try {
-    const H = window.WebApp && window.WebApp.HapticFeedback;
-    if (!H) return;
-    if (kind === 'success' || kind === 'error' || kind === 'warning') H.notificationOccurred(kind);
-    else H.impactOccurred(kind || 'light');
+    const ms = kind === 'heavy' ? 30 : (kind === 'medium' || kind === 'success') ? 15 : 8;
+    if (!androidVibrate(ms) && navigator.vibrate) navigator.vibrate(ms);
   } catch (e) {}
 }
 
@@ -751,40 +720,13 @@ const FX = (() => {
   };
 })();
 
-/* ---------------------------- SDK / PLATFORM ---------------------------- */
-try { if (window.WebApp) { window.WebApp.ready && window.WebApp.ready(); window.WebApp.disableVerticalSwipes && window.WebApp.disableVerticalSwipes(); } } catch (e) {}
-if (window.GameSDK && GameSDK.init) {
-  try { GameSDK.init(GAME_NAME, function () { console.log('[Game] GameSDK инициализирован для игры:', GAME_NAME); }); }
-  catch (e) { console.warn('[Game] GameSDK init error:', e); }
-}
-let lastSentScore = -1;
-function submitScore() {
-  const scoreToSend = Math.floor(SAVE.score);
-  if (scoreToSend <= 0 || scoreToSend === lastSentScore) return;
-  lastSentScore = scoreToSend;
-  if (window.GameSDK && typeof GameSDK.saveScore === 'function') {
-    try {
-      GameSDK.saveScore(scoreToSend).then(res => {
-        if (res && res.ok && res.is_new_record) {
-          toast('Новый рекорд в рейтинге!');
-          try { window.GameMetrika && GameMetrika.newRecord({ score: scoreToSend }); } catch (e) {}
-        }
-      }).catch(e => console.warn('[Game] saveScore ошибка:', e));
-    } catch (e) {}
-  }
-}
-function metr(kind, extra) {
-  try { if (window.GameMetrika && GameMetrika[kind]) GameMetrika[kind](extra || {}); } catch (e) {}
-}
+/* ---------------------------- PLATFORM (локальная Android-версия) ---------------------------- */
+/* SDK платформы Макс, лидерборды и метрика удалены — игра работает
+   полностью офлайн, весь прогресс хранится локально в localStorage. */
 function shareText(text) {
-  const fullText = text.includes(SHARE_LINK) ? text : text + '\nиграй прямо в Максе без скачиваний ' + SHARE_LINK;
-  metr('shareClick');
-  try { if (window.WebApp && window.WebApp.shareContent) { window.WebApp.shareContent({ text: fullText }); return; } } catch (e) {}
-  try { if (navigator.share) { navigator.share({ text: fullText }).catch(() => {}); return; } } catch (e) {}
-  try { if (navigator.clipboard) { navigator.clipboard.writeText(fullText); toast('Ссылка скопирована'); } } catch (e) {}
-}
-function openPrivacy() {
-  try { if (window.GameSDK && GameSDK.openConsentSettings) GameSDK.openConsentSettings(); else toast('Настройки данных недоступны'); } catch (e) {}
+  try { if (window.AndroidBridge && AndroidBridge.share) { AndroidBridge.share(text); return; } } catch (e) {}
+  try { if (navigator.share) { navigator.share({ text: text }).catch(() => {}); return; } } catch (e) {}
+  try { if (navigator.clipboard) { navigator.clipboard.writeText(text); toast('Скопировано в буфер обмена'); } } catch (e) {}
 }
 
 let toastT = null;
@@ -2273,7 +2215,6 @@ function lampPost(c, x, y) {
   c.fillStyle = '#1f2126'; c.fillRect(x - 6, y - 8, 12, 8);
 }
 
-
 /* ---- детальные объекты окружения ---- */
 function leafCrown(c, cx, cy, rx, ry, R, pal, n, s) {
   c.fillStyle = pal[0];
@@ -2900,7 +2841,6 @@ function startFight(mode, node) {
   $('hud').classList.add('on'); $('ctrl').classList.add('on');
   FX.music(boss || odef.id === 'tolyan' ? 'boss' : 'fight');
   SAVE.st.fights++;
-  metr('gameStart', { mode: mode, fighter: pdef.id, opponent: odef.id });
   startRound(true);
 }
 function startRound(first) {
@@ -3142,9 +3082,7 @@ function endMatch(win) {
     if (win) { G.survN++; G.survHp = p1.hp; G.survRub += rub; G.survPts += pts; S.survBest = Math.max(S.survBest, G.survN); }
   }
   persist();
-  submitScore();
   checkAch();
-  metr('gameFinish', { mode: G.mode, win: win, score: pts });
   if (unlockMsg) { setTimeout(() => { toast(unlockMsg); FX.unlockFx(); }, 600); }
   showResult(win, rub, pts, unlockMsg);
 }
@@ -3876,13 +3814,9 @@ btn('bLadder', () => { selMode = 'ladder'; selCur = SAVE.sel; showScreen('select
 btn('bSurv', () => { selMode = 'surv'; selCur = SAVE.sel; showScreen('select'); });
 btn('bShop', () => showScreen('shop'));
 btn('bAch', () => { renderAch(); openOv('ovAch'); });
-btn('bLb', () => openLeaderboard());
 btn('bSnd1', () => toggleSound());
 btn('bHelp', () => openOv('ovHelp'));
-btn('bShare1', () => shareText('Дерусь на районе в «ДВОР-КОМБАТ»: вахтёрши, скуфы и гопники! Мой счёт — ' + SAVE.score + ' очков.'));
-btn('bPriv', () => openPrivacy());
 btn('achClose', () => closeOv('ovAch'));
-btn('lbClose', () => closeOv('ovLb'));
 btn('helpClose', () => { closeOv('ovHelp'); if (!SAVE.tut) { SAVE.tut = 1; persist(); } });
 function toggleSound() {
   SAVE.sound = !SAVE.sound; persist(); FX.toggle();
@@ -4052,32 +3986,6 @@ btn('rShare', () => {
   shareText(t + ' Мой счёт: ' + SAVE.score + '.');
 });
 btn('rMenu', () => { closeOv('ovRes'); G.on = false; showScreen(G.mode === 'ladder' ? 'ladder' : 'menu'); });
-
-/* ---- рейтинг ---- */
-function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-function renderLeaderboard(rows) {
-  const list = $('lbList');
-  if (!rows || !rows.length) { list.innerHTML = '<div class="lb-empty">Рейтинг пока пуст. Стань первым!</div>'; return; }
-  list.innerHTML = rows.map((r, idx) => {
-    const rank = r.rank || idx + 1;
-    const medalCls = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
-    const initial = (r.first_name || '?').charAt(0).toUpperCase();
-    const photo = r.photo_url ? '<img src="' + escapeHtml(r.photo_url) + '" alt="" onerror="this.remove()">' : '';
-    return '<div class="lb-row' + (rank <= 3 ? ' top-' + rank : '') + '"><div class="lb-medal ' + medalCls + '">' + rank + '</div>' +
-      '<div class="lb-avatar">' + escapeHtml(initial) + photo + '</div><div class="lb-name">' + escapeHtml(r.first_name || 'Игрок') + '</div>' +
-      '<div class="lb-score">' + (r.score || 0) + '</div></div>';
-  }).join('');
-}
-function openLeaderboard() {
-  openOv('ovLb');
-  $('lbList').innerHTML = '<div class="lb-empty">Загрузка...</div>';
-  if (!window.GameSDK || typeof GameSDK.getLeaderboard !== 'function') { renderLeaderboard([]); return; }
-  try {
-    GameSDK.getLeaderboard(20).then(res => {
-      renderLeaderboard(res && res.ok ? res.leaderboard : []);
-    }).catch(() => renderLeaderboard([]));
-  } catch (e) { renderLeaderboard([]); }
-}
 
 /* ---- достижения ---- */
 const ACH = [
