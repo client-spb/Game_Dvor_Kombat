@@ -15,6 +15,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Только реальные устройства (arm) — выкидываем x86/x86_64 из APK
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
     }
 
     buildTypes {
@@ -29,14 +34,10 @@ android {
         }
     }
 
-    // Только реальные устройства (arm) — выкидываем x86/x86_64 из APK
     packaging {
         jniLibs {
             useLegacyPackaging = false
         }
-    }
-    ndk {
-        abiFilters += listOf("arm64-v8a", "armeabi-v7a")
     }
 
     // Сжатие ресурсов в APK
