@@ -19,12 +19,29 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // Минификация и удаление неиспользуемого кода/ресурсов — уменьшение APK
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+    }
+
+    // Только реальные устройства (arm) — выкидываем x86/x86_64 из APK
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+    ndk {
+        abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+    }
+
+    // Сжатие ресурсов в APK
+    androidResources {
+        ignoreAssetsPattern = "!.DS_Store:!Thumbs.db"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

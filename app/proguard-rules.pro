@@ -1,21 +1,15 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Правила для уменьшенного релизного APK
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Yandex Mobile Ads SDK — рефлексия внутри SDK, нельзя минифицировать классы
+-keep class com.yandex.mobile.ads.** { *; }
+-dontwarn com.yandex.mobile.ads.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# WebView JS-мост: методы AndroidBridge вызываются из JavaScript по имени — имена должны остаться
+-keepclassmembers class mob.dev.game_dvor_kombat.**Bridge* {
+    public *;
+}
+-keepattributes JavascriptInterface
+-keepattributes *Annotation*
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Compose/lifecycle — стандартные отступления не нужны, но на всякий случай:
+-dontwarn androidx.**
