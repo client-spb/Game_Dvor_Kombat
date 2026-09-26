@@ -51,7 +51,9 @@ object AdsManager {
     fun load(context: Context) {
         if (loading.getAndSet(true)) return
         val l = loader ?: InterstitialAdLoader(context.applicationContext).also { loader = it }
-        val request = AdRequest.Builder().build()
+        val request = AdRequest.Builder(
+            adUnitId = "demo-interstitial-yandex"
+        ).build()
         l.loadAd(request, object : InterstitialAdLoadListener {
             override fun onAdLoaded(ad: InterstitialAd) {
                 Log.d(TAG, "Interstitial loaded")
@@ -61,7 +63,7 @@ object AdsManager {
             }
 
             override fun onAdFailedToLoad(error: AdRequestError) {
-                Log.w(TAG, "Interstitial load failed: ${error.message}")
+                Log.w(TAG, "Interstitial load failed: ${error.description}")
                 loading.set(false)
                 // повторная попытка через 10 секунд
                 Handler(Looper.getMainLooper()).postDelayed({ load(context) }, 10_000)
@@ -86,7 +88,7 @@ object AdsManager {
             }
 
             override fun onAdFailedToShow(error: AdError) {
-                Log.w(TAG, "Interstitial show failed: ${error.message}")
+                Log.w(TAG, "Interstitial show failed: ${error.description}")
                 interstitialAd = null
                 load(activity)
             }
