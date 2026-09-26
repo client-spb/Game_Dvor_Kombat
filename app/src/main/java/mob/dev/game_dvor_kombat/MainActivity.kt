@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.VibratorManager
+import android.util.Log
 import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
@@ -51,16 +52,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Мост JS -> Android: нативный шеринг и вибрация. */
+    /** Мост JS -> Android: нативный шеринг, вибрация, реклама. */
     inner class AndroidBridge {
 
         @JavascriptInterface
         fun share(text: String) {
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, text)
+            // К сообщению всегда добавляем ссылку на приложение в RuStore
+            val full = text + "\nhttps://www.rustore.ru/catalog/app/mob.dev.game_dvor_kombat"
+            runOnUiThread {
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, full)
+                }
+                startActivity(Intent.createChooser(intent, "Поделиться"))
             }
-            startActivity(Intent.createChooser(intent, "Поделиться"))
         }
 
         @JavascriptInterface
@@ -76,7 +81,44 @@ class MainActivity : ComponentActivity() {
         fun onGameLose() {
             runOnUiThread { AdsManager.show(this@MainActivity) }
         }
+
+        /**
+         * Запрос показа вознаграждаемой рекламы (кнопка «Монеты за рекламу» в качалке).
+         * Результат возвращается в JS колбэком window.onRewardResult(true|false).
+         */
+        @JavascriptInterface
+        fun showRewardAd() {
+            runOnUiThread {
+                val shown = AdsManager.showReward(this@MainActivity) { earned ->
+                    webView?.evaluateJavascript(
+                        "window.onRewardResult && window.onRewardResult($earned)", null
+                    )
+                }
+                if (!shown) {
+                    webView?.evaluateJavascript(
+                        "window.onRewardResult && window.onRewardResult(false)", null
+                    )
+                }
+            }
+        }
+
+        /** Открыть внешнюю ссылку во внешнем браузере/приложении (канал Макс и т.п.). */
+        @JavascriptInterface
+        fun openUrl(url: String) {
+            runOnUiThread {
+                try {
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                } catch (e: Exception) {
+                    Log.w("MainActivity", "openUrl failed", e)
+                }
+            }
+        }
     }
+
+    private var webView: WebView? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     @Composable
@@ -114,7 +156,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     loadUrl("file:///android_asset/web/index.html")
-                }
+                }.also { webView = it }
             }
         )
     }
