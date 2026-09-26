@@ -123,7 +123,8 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 #ladBottom .hint{font-size:13px;color:#cfc6b4;font-weight:700;margin-left:6px}
 
 /* ---------- shop ---------- */
-#shopList{position:absolute;left:50%;top:74px;transform:translateX(-50%);width:640px;display:flex;flex-direction:column;gap:8px}
+#shopWrap{position:absolute;left:22px;right:22px;top:70px;bottom:64px;display:flex;flex-direction:column;gap:8px}
+#shopList{flex:1;display:flex;flex-direction:column;gap:8px;min-height:0}
 .up{display:flex;align-items:center;gap:14px;height:68px;padding:0 12px;background:linear-gradient(90deg,rgba(40,37,33,.95),rgba(26,24,21,.95));
   border:2px solid #4a4236;border-radius:6px}
 .up .uic{width:48px;height:48px;flex-shrink:0}
@@ -136,18 +137,21 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
 .up .btn{height:44px;font-size:16px;min-width:120px;justify-content:center;padding:0 12px}
 .up .btn .bi{width:24px;height:24px}
 .btn.dis{filter:grayscale(1) brightness(.6)}
-#shopBack{position:absolute;left:22px;bottom:16px}
-/* блок «монеты за рекламу» в качалке */
-#adRow{position:absolute;right:22px;top:74px;width:340px;display:flex;flex-direction:column;gap:8px}
-.adrow{display:flex;align-items:center;gap:12px;min-height:68px;padding:10px 12px;background:linear-gradient(90deg,rgba(24,40,34,.95),rgba(14,26,22,.95));
-  border:2px solid #1ea57f;border-radius:6px;box-shadow:0 0 14px rgba(56,214,166,.15)}
-.adrow .uic{width:44px;height:44px;flex-shrink:0}
+#shopBottom{display:flex;align-items:center;gap:12px}
+#shopBottom .hint{font-size:12.5px;color:#cfc6b4;font-weight:700}
+/* блок «монеты за рекламу» в качалке — последняя строка списка апгрейдов */
+.adrow{display:flex;align-items:center;gap:14px;height:68px;padding:0 12px;background:linear-gradient(90deg,rgba(24,40,34,.95),rgba(14,26,22,.95));
+  border:2px solid #1ea57f;border-radius:6px;box-shadow:0 0 14px rgba(56,214,166,.15);flex-shrink:0}
+.adrow .uic{width:48px;height:48px;flex-shrink:0}
 .adrow .ut{flex:1}
-.adrow .ut b{font-family:'Russo One','Rubik',sans-serif;font-size:15.5px;display:block;color:#9fe9d0}
-.adrow .ut span{font-size:11.5px;color:#bdb3a0}
-.adrow .btn{height:42px;font-size:15px;min-width:112px;justify-content:center;padding:0 10px}
+.adrow .ut b{font-family:'Russo One','Rubik',sans-serif;font-size:17px;display:block;color:#9fe9d0}
+.adrow .ut span{font-size:12px;color:#bdb3a0}
+.adrow .btn{height:44px;font-size:16px;min-width:120px;justify-content:center;padding:0 12px}
+.adrow .btn .bi{width:24px;height:24px}
 .adrow.cool{border-color:#4a4236;box-shadow:none}
-.adnote{font-size:11.5px;font-weight:700;color:#8fae9f;text-align:right;padding-right:4px}
+/* подсветка кнопок, ставших доступными после награды */
+@keyframes goldGlow{0%{box-shadow:0 0 0 rgba(255,210,58,0)}35%{box-shadow:0 0 16px rgba(255,210,58,.85)}100%{box-shadow:0 0 0 rgba(255,210,58,0)}}
+.up .btn.glow,.adrow .btn.glow{animation:goldGlow 1.2s ease-out 2}
 
 /* ---------- hud ---------- */
 #hud{position:absolute;left:0;right:0;top:0;height:100px;display:none;z-index:5;pointer-events:none}
@@ -317,16 +321,18 @@ button{font-family:inherit;border:none;background:none;color:inherit;cursor:poin
   <!-- SHOP -->
   <div id="scrShop" class="scr">
    <div class="hdr"><h1>Качалка</h1><div class="wallet"><i class="ic" data-ic="coin"></i><span class="walletV">0</span></div></div>
-   <div id="shopList"></div>
-   <div id="adRow">
-    <div class="adnote" id="adNote">Реклама от Yandex Ads</div>
+   <div id="shopWrap">
+    <div id="shopList"></div>
     <div class="adrow" id="adBox">
      <i class="uic ic" data-ic="coin"></i>
      <div class="ut"><b>Монеты за рекламу</b><span id="adSub">Посмотри ролик и получи +150 ₽</span></div>
      <button class="btn mint" id="adWatch"><i class="bi ic" data-ic="play"></i><span class="disp" id="adBtnT">Смотреть</span></button>
     </div>
+    <div id="shopBottom">
+     <button class="btn gray" id="shopBack"><i class="bi ic" data-ic="back"></i><span class="disp">Меню</span></button>
+     <span class="hint" id="adNote">Реклама от Yandex Ads · раз в 5 минут</span>
+    </div>
    </div>
-   <button class="btn gray" id="shopBack"><i class="bi ic" data-ic="back"></i><span class="disp">Меню</span></button>
   </div>
 
   <!-- HUD -->
@@ -3927,6 +3933,7 @@ const UPS = [
   { k: 'arm', n: 'Стальной пресс', d: 'Получаешь меньше урона', ic: 'dumbbell' }
 ];
 const UP_COST = [120, 260, 480, 800, 1250];
+let adJustEarned = false;           // после награды подсветить newly-доступные кнопки
 function refreshShop() {
   const l = $('shopList');
   l.innerHTML = UPS.map(u => {
@@ -3934,8 +3941,9 @@ function refreshShop() {
     return '<div class="up"><i class="uic ic" data-ic="' + u.ic + '"></i><div class="ut"><b>' + u.n + '</b><span>' + u.d + '</span><div class="pips">' +
       [0, 1, 2, 3, 4].map(i => '<i class="' + (i < lv ? 'on' : '') + '"></i>').join('') + '</div></div>' +
       (max ? '<button class="btn mint dis"><span class="disp">Максимум</span></button>' :
-        '<button class="btn' + (SAVE.rub < cost ? ' dis' : '') + '" data-k="' + u.k + '"><i class="bi ic" data-ic="coin"></i><span class="disp">' + cost + '</span></button>') + '</div>';
+        '<button class="btn' + (SAVE.rub < cost ? ' dis' : (adJustEarned ? ' glow' : '')) + '" data-k="' + u.k + '"><i class="bi ic" data-ic="coin"></i><span class="disp">' + cost + '</span></button>') + '</div>';
   }).join('');
+  adJustEarned = false;
   paintIcons(l);
   l.querySelectorAll('button[data-k]').forEach(b => b.addEventListener('click', () => {
     const k = b.getAttribute('data-k'), lv = SAVE.up[k], cost = UP_COST[lv];
@@ -3985,12 +3993,16 @@ window.onRewardReady = function (ok) {
 };
 window.onRewardResult = function (earned) {
   adBusy = false;
-  updateAdBtn(); refreshShop(); refreshWallet(); refreshSelect();
   if (earned) {
     localStorage.setItem(SAVE_KEY + '_adT', String(Date.now()));
     SAVE.rub += AD_REWARD; persist(); FX.coin(); hap('success');
-    toast('+' + AD_REWARD + ' ₽ за просмотр!'); updateAdBtn();
+    toast('+' + AD_REWARD + ' ₽ за просмотр!');
+    adJustEarned = true;            // подсветить ставшие доступными кнопки
+    updateAdBtn(); refreshShop(); refreshWallet(); refreshSelect();
+    const aw = $('adWatch');
+    if (aw && !aw.classList.contains('dis')) { aw.classList.add('glow'); setTimeout(() => aw.classList.remove('glow'), 2600); }
   } else {
+    updateAdBtn(); refreshShop(); refreshWallet(); refreshSelect();
     FX.err(); hap('error');
     toast('Реклама не показана или ролик не досмотрен');
   }
