@@ -37,7 +37,7 @@ android {
 
 dependencies {
     // Yandex Mobile Ads SDK (реклама)
-    implementation("com.yandex.android:mobileads:8.0.0")
+    implementation("com.yandex.android:mobileads:8.4.0")
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
